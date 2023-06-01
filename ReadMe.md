@@ -87,7 +87,8 @@ module.exports = {
 ```
 
 - We can change the name of it.
-This type of export is called default export
+  This type of export is called default export
+
 ```js
 module.exports = {
   addFn: add,
@@ -111,27 +112,123 @@ const { addFn, sub } = require("./math");
 console.log(addFn(2, 4));
 ```
 
+- This type of export is called default export
 
-* This type of export is called default export
 ```js
 module.exports = {
   addFn: add,
   subFn: sub,
 };
 ```
-Anonymous  Function
+
+Anonymous Function
 We can export by `export object`
+
 ```js
-module.add = (a, b) => a+b;
-module.sub = (a, b) => a-b;
+module.add = (a, b) => a + b;
+module.sub = (a, b) => a - b;
 ```
 
-* Node has some inBuild functions too.
+- Node has some inBuild functions too.
 
 ```js
 const math = require("./math");
 ```
+
 ```js
 const math = require("math");
 ```
+
 If we are looking locally, we need to add `./`.If we are looking in built in functions, we need to only write the name of it eg `fs` => file system
+
+3. File Handling.
+
+For file handling, we need `const fs = require('fs')`. This is in build for nodejs.
+This enables interacting will file system.
+
+This will create a file named `test.text` with "hello" in it.
+
+```js
+const fs = require("fs");
+fs.writeFileSync("./test.txt", "hello");
+```
+
+- To create files
+  we can use with with 2 ways
+
+```js
+// sync
+fs.writeFileSync("./test.txt", "hello");
+
+// async
+fs.writeFile("./test.txt", "hello", (err) => {});
+```
+
+These both will overwrite if used on one file twice.
+
+- To read files.
+
+with readFileSync
+
+```js
+const result = fs.readFileSync("./Contact.txt", "utf-8");
+
+console.log(result);
+```
+
+with readFile
+
+```js
+fs.readFile("./Contact.txt", "utf-8", (err, result) => {
+  if (err) {
+    console.log(err, "error");
+  } else {
+    console.log(result);
+  }
+});
+```
+
+readFileSync returns result automatically while in readFile, we need to give a callback that catches error and save result. readFile do not return anything. It always expects callback.
+
+- Append
+  writeFileSync or writeFile used to create a file and add data in it ass we did above. But it overwrites the data if used on same file. In that case we can use `append`
+
+```js
+fs.appendFileSync("./test.txt", new Date().getDate().toLocaleString());
+
+fs.appendFileSync("./test.txt", `hey There/n`);
+```
+
+
+* To copy file
+```js
+fs.cpSync("./test.txt", "./copy.txt")
+```
+
+* To delete a file
+
+```js
+fs.unlinkSync("./copyy.txt")
+```
+
+
+* To check stats
+```js
+console.log(fs.statSync("./test.txt"));
+```
+
+* To check if its a file
+```js
+console.log(fs.statSync("./test.txt").isFile()); //true
+```
+
+* To create dir
+```js
+fs.mkdirSync("docs")
+```
+
+* To create dir folder in folder
+```js
+fs.mkdirSync("doc/1/2", { recursive: true })
+```
+
