@@ -199,36 +199,127 @@ fs.appendFileSync("./test.txt", new Date().getDate().toLocaleString());
 fs.appendFileSync("./test.txt", `hey There/n`);
 ```
 
-
-* To copy file
-```js
-fs.cpSync("./test.txt", "./copy.txt")
-```
-
-* To delete a file
+- To copy file
 
 ```js
-fs.unlinkSync("./copyy.txt")
+fs.cpSync("./test.txt", "./copy.txt");
 ```
 
+- To delete a file
 
-* To check stats
+```js
+fs.unlinkSync("./copyy.txt");
+```
+
+- To check stats
+
 ```js
 console.log(fs.statSync("./test.txt"));
 ```
 
-* To check if its a file
+- To check if its a file
+
 ```js
 console.log(fs.statSync("./test.txt").isFile()); //true
 ```
 
-* To create dir
+- To create dir
+
 ```js
-fs.mkdirSync("docs")
+fs.mkdirSync("docs");
 ```
 
-* To create dir folder in folder
+- To create dir folder in folder
+
 ```js
-fs.mkdirSync("doc/1/2", { recursive: true })
+fs.mkdirSync("doc/1/2", { recursive: true });
 ```
+
+4.
+
+client > request > request goes to server > req comes to server > Request comes in event queue. > Then req goes to event loop. work of event loop is to check weather there is a new request or not > This request can be solved by 2 ways.
+
+4.1> Blocking operation => Request goes to thread pool > Thread pool is a pool of threads with are basically workers > First workers are checked, if available it processes the request and send response. > If workers are full, task will be completed after the workers get free. i mean thread.
+
+4.2> Non Blocking operation => Accepts the request > process it and sends response.
+
+image.png
+
+* 
+```js
+// sync BLOCKING
+const result = fs.readFileSync("./test.txt", "utf-8");
+console.log(result);
+
+// async NON BLOCKING
+fs.readFile("./test.txt", (result) => {
+  console.log(result);
+});
+```
+
+* 
+```js
+console.log("1");
+// sync BLOCKING
+const result = fs.readFileSync("./test.txt", "utf-8");
+console.log(result);
+console.log("2");
+```
+
+RESULT=> will be
+1
+papa - 9419401111
+2
+
+* 
+```js
+console.log("1");
+// sync BLOCKING
+const result = fs.readFileSync("./test.txt", "utf-8");
+console.log(result);
+console.log("2");
+```
+
+RESULT=> will be
+1
+papa - 9419401111
+2
+It blocks
+It returns 
+
+
+* 
+```js
+console.log("1");
+// async NON BLOCKING
+fs.readFile("./test.txt", "utf-8", (err, result) => {
+    console.log(result);
+})
+
+console.log("2");
+console.log("3");
+```
+Result =>
+1
+2
+3
+papa - 9419401111
+
+It is non blocking. 
+It do not returns. We need to give a callback Functions
+
+Thread Pool workers depend on the cores. If server or pc has 6 cores, it will have 6 workers.
+
+
+
+To check the size of cores.
+```js
+// OS
+
+const os = require("os")
+
+console.log(os.cpus().length); //12
+```
+
+We should always write a code that is non blocking.
 
