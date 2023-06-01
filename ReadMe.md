@@ -322,4 +322,5 @@ console.log(os.cpus().length); //12
 ```
 
 We should always write a code that is non blocking.
+![image](https://github.com/simrin3308/LearnNodeJs/assets/110960043/fc239977-bdf1-4f9d-a046-41209391e2a2)
 
