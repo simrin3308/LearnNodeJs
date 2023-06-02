@@ -634,3 +634,27 @@ Express current version is 4.18.2
 `^` => Install all minor fixes and recommended automatically. Don't change the major one.
 
 `~` => Approximate matching Changes only approximate one. Only last one. (minor one)
+
+# 10 Rest API
+
+- Rest => Representational State Transfer.
+
+RULES => {NOTE =>THESE ARE NOT OFFICIAL RULES}
+
+1. Works on Server Client Architecture => Server is a different machine and client is a different. Both should not be independent on each other.
+
+- Response can be anything => text, image, html, json etc.
+
+- If client is Browser, it can easily handle the `html`. But if the client is mobile or something else(Alexa), it do not render `html`. So there causes the issue. But we can send `JSON` which can be used by any client but one step increases. Json is a raw data and needs to be worked on.
+
+- JSON is key value pairs.
+
+- Response send by `html` is called `SSR=>Server Side Rendering`. It is very fast and used by many big techs.
+
+- If we know that our client will only be browser, we can use response `html`
+
+- Sending response by `JSON` means `Client Side Rendering (CSR)` which is then used by react etc.
+
+2. Always respect all HTTP requests.
+
+- Don't misunderstood `post` with `patch`
