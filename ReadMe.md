@@ -245,7 +245,8 @@ client > request > request goes to server > req comes to server > Request comes 
 
 image.png
 
-* 
+-
+
 ```js
 // sync BLOCKING
 const result = fs.readFileSync("./test.txt", "utf-8");
@@ -257,7 +258,8 @@ fs.readFile("./test.txt", (result) => {
 });
 ```
 
-* 
+-
+
 ```js
 console.log("1");
 // sync BLOCKING
@@ -271,7 +273,8 @@ RESULT=> will be
 papa - 9419401111
 2
 
-* 
+-
+
 ```js
 console.log("1");
 // sync BLOCKING
@@ -285,41 +288,96 @@ RESULT=> will be
 papa - 9419401111
 2
 It blocks
-It returns 
+It returns
 
+-
 
-* 
 ```js
 console.log("1");
 // async NON BLOCKING
 fs.readFile("./test.txt", "utf-8", (err, result) => {
-    console.log(result);
-})
+  console.log(result);
+});
 
 console.log("2");
 console.log("3");
 ```
+
 Result =>
 1
 2
 3
 papa - 9419401111
 
-It is non blocking. 
+It is non blocking.
 It do not returns. We need to give a callback Functions
 
 Thread Pool workers depend on the cores. If server or pc has 6 cores, it will have 6 workers.
 
-
-
 To check the size of cores.
+
 ```js
 // OS
 
-const os = require("os")
+const os = require("os");
 
 console.log(os.cpus().length); //12
 ```
 
 We should always write a code that is non blocking.
 
+5. Http
+
+- We have a build it `http`
+
+```js
+const http = require("http");
+const myServer = http.createServer((req, res) => {
+  console.log("new req received");
+  res.end("hello from server");
+});
+```
+
+This will create a server. `createServer` has a request listener function which has 2 parameters. `req` and `res`. Req gives the information about the user or client and res is used to send the responses.
+
+- we need to run the server on a specific port. For that we need to use `listen`.
+
+```js
+myServer.listen(8000, () => {
+  console.log("server started");
+});
+```
+
+The callback function checks whether our .server is running good or not,
+
+- Server that maintains a log
+
+```js
+const myServer = http.createServer((req, res) => {
+  const log = `${Date.now()}: New Req Received`;
+  fs.appendFile("log.txt", log, (err, data) => {
+    res.end("hello from server");
+  });
+});
+
+myServer.listen(8000, () => {
+  console.log("server started");
+});
+```
+
+- we can also check the path where the req came from.
+
+```js
+const myServer = http.createServer((req, res) => {
+  const log = `${Date.now()}: ${req.url} New Req Received`;
+  fs.appendFile("log.txt", log, (err, data) => {
+    res.end("hello from server");
+  });
+});
+```
+
+<!-- Result -->
+
+1685685435697: /about New Req Received
+1685685435735: /about New Req Received
+1685685435772: /favicon.ico New Req Received
