@@ -3,7 +3,6 @@ const fs = require("fs")
 const url = require("url")
 
 
-// we can also send different responses depending on the page
 const myServer = http.createServer((req, res) => {
     const log = `${Date.now()}: ${req.url} New Req Received`;
     const myUrl = url.parse(req.url, true)
