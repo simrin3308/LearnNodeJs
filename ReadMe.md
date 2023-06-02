@@ -41,7 +41,7 @@ if we do `node run hello` it will run the index file
 
 By this way we can create our own dependencies and packages. We need `npm init` for the creation of `package.json` file.
 
-2. Modular programming => We split big project into small modules.
+# 2. Modular programming => We split big project into small modules.
 
 Math related work in
 
@@ -141,7 +141,7 @@ const math = require("math");
 
 If we are looking locally, we need to add `./`.If we are looking in built in functions, we need to only write the name of it eg `fs` => file system
 
-3. File Handling.
+# 3. File Handling.
 
 For file handling, we need `const fs = require('fs')`. This is in build for nodejs.
 This enables interacting will file system.
@@ -235,7 +235,7 @@ fs.mkdirSync("docs");
 fs.mkdirSync("doc/1/2", { recursive: true });
 ```
 
-4.
+# 4. 
 
 client > request > request goes to server > req comes to server > Request comes in event queue. > Then req goes to event loop. work of event loop is to check weather there is a new request or not > This request can be solved by 2 ways.
 
@@ -327,7 +327,7 @@ console.log(os.cpus().length); //12
 We should always write a code that is non blocking.
 ![image](https://github.com/simrin3308/LearnNodeJs/assets/110960043/3f5327d1-5bcf-4e1d-a2eb-babaca4768e3)
 
-5. Http
+# 5. Http
 
 - We have a build it `http`
 
