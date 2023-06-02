@@ -1,41 +1,24 @@
 const http = require("http")
 const fs = require("fs")
-
-
-// const myServer = http.createServer((req, res) => {
-//     const log = `${Date.now()}: New Req Received`;
-//     fs.appendFile("log.txt", log, (err, data) => {
-//         res.end("hello from server")
-//     })
-// });
-
-
-// myServer.listen(8000, () => {
-//     console.log('server started');
-// })
-
-
-// // we can also check the path where the req came from
-// const myServer = http.createServer((req, res) => {
-//     const log = `${Date.now()}: ${req.url} New Req Received`;
-//     fs.appendFile("log.txt", log, (err, data) => {
-//         res.end("hello from server")
-//     })
-// });
+const url = require("url")
 
 
 // we can also send different responses depending on the page
 const myServer = http.createServer((req, res) => {
     const log = `${Date.now()}: ${req.url} New Req Received`;
+    const myUrl = url.parse(req.url, true)
+    console.log(myUrl);
     fs.appendFile("log.txt", log, (err, data) => {
-        switch (req.url) {
+        if (myUrl.pathname === "/favicon.ico") return res.end()
+        switch (myUrl.pathname) {
             case '/': res.end("hello from Home")
                 break;
-            case '/about': res.end("hello from about")
+            case '/about':
+                const userName = myUrl.query.myName;
+                res.end(`hello from about ${userName}`)
                 break;
             default: res.end("hello from 404")
         }
-
     })
 });
 
@@ -43,4 +26,8 @@ const myServer = http.createServer((req, res) => {
 myServer.listen(8000, () => {
     console.log('server started');
 })
+
+
+
+
 

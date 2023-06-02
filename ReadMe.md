@@ -327,7 +327,6 @@ console.log(os.cpus().length); //12
 We should always write a code that is non blocking.
 ![image](https://github.com/simrin3308/LearnNodeJs/assets/110960043/3f5327d1-5bcf-4e1d-a2eb-babaca4768e3)
 
-
 5. Http
 
 - We have a build it `http`
@@ -383,3 +382,45 @@ const myServer = http.createServer((req, res) => {
 1685685435697: /about New Req Received
 1685685435735: /about New Req Received
 1685685435772: /favicon.ico New Req Received
+
+6. URL
+
+https://www.sam.com/
+
+https:// => Protocol => Hypertext transfer protocol secure
+
+www.sam.com => Domain => User friendly name.
+
+/ => path
+
+- Query parameters
+www.sam.com/about?userId=1&a=2
+
+
+* We have already created server. Now we will add more functionality. We have a npm package called `url`. We will install it.
+
+```js
+npm i url
+```
+
+```js
+const myUrl = url.parse(req.url)
+const myUrl = url.parse(req.url, true)// url string => TRUE
+```
+url => http://localhost:8000/about?q=papa
+RESULT 
+Url {
+  protocol: null,
+  slashes: null,
+  auth: null,
+  host: null,
+  port: null,
+  hostname: null,
+  hash: null,
+  search: '?q=papa',
+  query: [Object: null prototype] { q: 'papa' },
+  pathname: '/about',
+  path: '/about?q=papa',
+  href: '/about?q=papa'
+}
+
