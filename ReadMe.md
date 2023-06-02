@@ -500,9 +500,8 @@ In homepage we don't need a `PUT` request. We only need a `GET` Request.
 
 Above we created a signup page. Suppose we have a contact form. We need to use both `post` and `get` methods. we can handle them both as we handled above.
 
-
-
 - Ways to write it =>
+
 ```js
 const http = require("http");
 const fs = require("fs");
@@ -539,4 +538,85 @@ const myServer = http.createServer((req, res) => handleFunction);
 myServer.listen(8000, () => {
   console.log("server started");
 });
+```
+
+# 08. Express
+
+- In express js code becomes clean.
+- we can automatically use the queries.
+- Handling the routes becomes easy in express
+
+
+```js
+const express = require("express");
+const http = require("http");
+const app = express();
+
+app.get("/", (req, res) => {
+  return res.send("Hello from home");
+});
+app.get("/about", (req, res) => {
+  return res.send(`Hello from about ${req.query.name}`);
+});
+
+const myServer = http.createServer(app);
+
+myServer.listen(8000, () => console.log("server started"));
+```
+
+In express we do not need to write the create server. It automatically handles it.
+
+- Above code can be written as==>
+
+```js
+const express = require("express");
+const app = express();
+
+app.get("/", (req, res) => {
+  return res.send("Hello from home");
+});
+app.get("/about", (req, res) => {
+  return res.send(`Hello from about ${req.query.name}`);
+});
+
+app.listen(8000, () => console.log("server started"));
+
+// const myServer = http.createServer(app);
+
+// myServer.listen(8000, () => console.log("server started"));
+```
+
+
+
+* Basic routing
+Routing refers to determining how an application responds to a client request to a particular endpoint, which is a URI (or path) and a specific HTTP request method (GET, POST, and so on).
+
+Each route can have one or more handler functions, which are executed when the route is matched.
+
+Route definition takes the following structure:
+
+app.METHOD(PATH, HANDLER)
+- - Where:
+
+- app is an instance of express.
+- METHOD is an HTTP request method, in lowercase.
+- PATH is a path on the server.
+- HANDLER is the function executed when the route is matched.
+
+```js
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.post('/', (req, res) => {
+  res.send('Got a POST request')
+})
+
+app.put('/user', (req, res) => {
+  res.send('Got a PUT request at /user')
+})
+
+app.delete('/user', (req, res) => {
+  res.send('Got a DELETE request at /user')
+})
 ```
