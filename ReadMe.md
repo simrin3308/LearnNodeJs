@@ -546,7 +546,6 @@ myServer.listen(8000, () => {
 - we can automatically use the queries.
 - Handling the routes becomes easy in express
 
-
 ```js
 const express = require("express");
 const http = require("http");
@@ -586,16 +585,15 @@ app.listen(8000, () => console.log("server started"));
 // myServer.listen(8000, () => console.log("server started"));
 ```
 
-
-
-* Basic routing
-Routing refers to determining how an application responds to a client request to a particular endpoint, which is a URI (or path) and a specific HTTP request method (GET, POST, and so on).
+- Basic routing
+  Routing refers to determining how an application responds to a client request to a particular endpoint, which is a URI (or path) and a specific HTTP request method (GET, POST, and so on).
 
 Each route can have one or more handler functions, which are executed when the route is matched.
 
 Route definition takes the following structure:
 
 app.METHOD(PATH, HANDLER)
+
 - - Where:
 
 - app is an instance of express.
@@ -604,19 +602,35 @@ app.METHOD(PATH, HANDLER)
 - HANDLER is the function executed when the route is matched.
 
 ```js
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 
-app.post('/', (req, res) => {
-  res.send('Got a POST request')
-})
+app.post("/", (req, res) => {
+  res.send("Got a POST request");
+});
 
-app.put('/user', (req, res) => {
-  res.send('Got a PUT request at /user')
-})
+app.put("/user", (req, res) => {
+  res.send("Got a PUT request at /user");
+});
 
-app.delete('/user', (req, res) => {
-  res.send('Got a DELETE request at /user')
-})
+app.delete("/user", (req, res) => {
+  res.send("Got a DELETE request at /user");
+});
 ```
+
+# 9. Versioning
+
+Express current version is 4.18.2
+
+- <ins>1st part (4)</ins> => Breaking Update > Major release > code made in Ver4 can or cannot work in ver5.
+
+- <ins>2nd part (18) </ins> => Recommended Bug Security Fix > New feature >
+
+- <ins>3rd part (2) </ins> => Minor fixes > optional update >
+
+"^4.18.2" => `^` This is called carrot symbol. This means that the major update will remain fix. That is `4`. We can install other like 4.19.2 or etc. But 4 needs to be constant.
+
+`^` => Install all minor fixes and recommended automatically. Don't change the major one.
+
+`~` => Approximate matching Changes only approximate one. Only last one. (minor one)
