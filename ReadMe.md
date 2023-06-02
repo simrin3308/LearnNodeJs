@@ -1,4 +1,4 @@
-# 1. 
+# 1.
 
 - To run a file => {Node index} in terminal
 
@@ -235,7 +235,7 @@ fs.mkdirSync("docs");
 fs.mkdirSync("doc/1/2", { recursive: true });
 ```
 
-# 4. 
+# 4.
 
 client > request > request goes to server > req comes to server > Request comes in event queue. > Then req goes to event loop. work of event loop is to check weather there is a new request or not > This request can be solved by 2 ways.
 
@@ -383,7 +383,7 @@ const myServer = http.createServer((req, res) => {
 1685685435735: /about New Req Received
 1685685435772: /favicon.ico New Req Received
 
-6. URL
+# 6. URL
 
 https://www.sam.com/
 
@@ -394,8 +394,7 @@ www.sam.com => Domain => User friendly name.
 / => path
 
 - Query parameters
-www.sam.com/about?userId=1&a=2
-
+  www.sam.com/about?userId=1&a=2
 
 * We have already created server. Now we will add more functionality. We have a npm package called `url`. We will install it. This package will give us all the details about the url
 
@@ -404,53 +403,100 @@ npm i url
 ```
 
 ```js
-const myUrl = url.parse(req.url)
-const myUrl = url.parse(req.url, true)// url string => TRUE
+const myUrl = url.parse(req.url);
+const myUrl = url.parse(req.url, true); // url string => TRUE
 ```
 
 ```js
-const http = require("http")
-const fs = require("fs")
-const url = require("url")
-
+const http = require("http");
+const fs = require("fs");
+const url = require("url");
 
 const myServer = http.createServer((req, res) => {
-    const log = `${Date.now()}: ${req.url} New Req Received`;
-    const myUrl = url.parse(req.url, true)
-    console.log(myUrl);
-    fs.appendFile("log.txt", log, (err, data) => {
-        if (myUrl.pathname === "/favicon.ico") return res.end()
-        switch (myUrl.pathname) {
-            case '/': res.end("hello from Home")
-                break;
-            case '/about':
-                const userName = myUrl.query.myName;
-                res.end(`hello from about ${userName}`)
-                break;
-            default: res.end("hello from 404")
-        }
-    })
+  const log = `${Date.now()}: ${req.url} New Req Received`;
+  const myUrl = url.parse(req.url, true);
+  console.log(myUrl);
+  fs.appendFile("log.txt", log, (err, data) => {
+    if (myUrl.pathname === "/favicon.ico") return res.end();
+    switch (myUrl.pathname) {
+      case "/":
+        res.end("hello from Home");
+        break;
+      case "/about":
+        const userName = myUrl.query.myName;
+        res.end(`hello from about ${userName}`);
+        break;
+      default:
+        res.end("hello from 404");
+    }
+  });
 });
 
+myServer.listen(8000, () => {
+  console.log("server started");
+});
+```
+
+url => http://localhost:8000/about?q=papa
+RESULT
+Url {
+protocol: null,
+slashes: null,
+auth: null,
+host: null,
+port: null,
+hostname: null,
+hash: null,
+search: '?q=papa',
+query: [Object: null prototype] { q: 'papa' },
+pathname: '/about',
+path: '/about?q=papa',
+href: '/about?q=papa'
+}
+
+# 7. Http methods
+
+7.1> http get => To get some data from the server. Whenever we search a url, browser creates a `get` request.
+
+7.2> http POST => When we want to send data and mutate data from server. Eg forms, signIn etc.
+
+```js
+const http = require("http");
+const fs = require("fs");
+const url = require("url");
+
+const myServer = http.createServer((req, res) => {
+  const log = `${Date.now()}: ${req.method} New Req Received`;
+  const myUrl = url.parse(req.url, true);
+  console.log(myUrl);
+  fs.appendFile("log.txt", log, (err, data) => {
+    if (myUrl.pathname === "/favicon.ico") return res.end();
+    switch (myUrl.pathname) {
+      case "/":
+        if (req.method === "GET") res.end("hello from Home");
+        break;
+      case "/about":
+        const userName = myUrl.query.myName;
+        res.end(`hello from about ${userName}`);
+      case "/signup":
+        if (req.method === "GET") res.end(`hello from signup`);
+        else if (req.method === "POST") {
+          //send data to DB
+          res.end(`Sucess`);
+        }
+        break;
+      default:
+        res.end("hello from 404");
+    }
+  });
+});
 
 myServer.listen(8000, () => {
-    console.log('server started');
-})
+  console.log("server started");
+});
 ```
-url => http://localhost:8000/about?q=papa
-RESULT 
-Url {
-  protocol: null,
-  slashes: null,
-  auth: null,
-  host: null,
-  port: null,
-  hostname: null,
-  hash: null,
-  search: '?q=papa',
-  query: [Object: null prototype] { q: 'papa' },
-  pathname: '/about',
-  path: '/about?q=papa',
-  href: '/about?q=papa'
-}
+
+In homepage we don't need a `PUT` request. We only need a `GET` Request.
+
+Above we created a signup page. Suppose we have a contact form. We need to use both `post` and `get` methods. we can handle them both as we handled above.
 
