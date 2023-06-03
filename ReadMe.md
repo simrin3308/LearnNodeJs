@@ -658,3 +658,140 @@ RULES => {NOTE =>THESE ARE NOT OFFICIAL RULES}
 2. Always respect all HTTP requests.
 
 - Don't misunderstood `post` with `patch`
+
+# 11. Create Rest API
+
+<!-- TASKS -->
+
+Creation of rest api which supports JSON data
+
+TASK 1.1 GET /api/users => List all users(json)
+
+TASK 1.2 GET /users => List all users(HTML)
+
+TASK 2. Get /api/users/1 => List details of user with ID 1
+
+TASK 3. Get /api/users/2 => List details of user with ID 2
+
+TASK 4. POST /users => Create new user
+
+TASK 5. PATCH /user/1 => Edit the user at id 1
+
+TASK 6.> DELETE /user/1 => Delete the user at ID 1
+
+- Imports
+
+```js
+const express = require("express");
+const fs = require("fs");
+const users = require("./MOCK_DATA.json");
+const app = express();
+const PORT = 8000;
+
+// ROUTES
+
+// task 1.1  /api/users
+app.get("/api/users", (req, res) => {
+  return res.json(users);
+});
+
+// task 1.2  /users
+app.get("/users", (req, res) => {
+  const html = `
+    <ul>
+        ${users.map((user) => `<li>${user.first_name}</li>`).join("")}
+    </ul>
+    `;
+  res.send(html);
+});
+
+// task 2  /api/users/1  "/api/users/:id"
+app.get("/api/users/:Id", (req, res) => {
+  // first we will get the ID
+  // this will be returned as string we need to convert this into number
+  const Id = Number(req.params.Id);
+
+  // then we will find that id in JSON data
+  const user = users.find((user) => user.id === Id);
+  res.json(user);
+});
+
+// task 3 done above
+
+// Task 4
+app.post("/api/users", (req, res) => {
+  // todo
+  return res.json({ status: "pending" });
+});
+
+// Task 5
+app.patch("/api/users/:Id", (req, res) => {
+  // todo
+  const Id = Number(req.params.Id);
+  return res.json({ status: "pending" });
+});
+
+// Task 6
+app.delete("/api/users/:Id", (req, res) => {
+  // todo
+  const Id = Number(req.params.Id);
+  return res.json({ status: "pending" });
+});
+
+app.listen(PORT, () => {
+  console.log("Server Started");
+});
+```
+
+- we can see these 4,5,6 are same routes so me can merge them
+
+```js
+// grouping
+app
+  .route("/api/users/:Id")
+  .get((req, res) => {
+    return res.json({ status: "pending" });
+  })
+  .patch((req, res) => {
+    const Id = Number(req.params.Id);
+    return res.json({ status: "pending" });
+  })
+  .delete((req, res) => {
+    const Id = Number(req.params.Id);
+    return res.json({ status: "pending" });
+  });
+```
+
+- But post is not added in group.
+
+- POST REQ
+
+```js
+// id do not comes from frontEnd
+app.post("/api/users", (req, res) => {
+  const body = req.body;
+  // this body returns as undefined. So we need to use a middleware
+  users.push({ ...body, id: users.length + 1 });
+  fs.writeFile("./MOCK_DATA.json", JSON.stringify(users), (err, data) => {
+    return res.json({ status: "pending" });
+  });
+});
+```
+
+```js
+// middleware for body
+app.use(express.urlencoded({ extended: false }));
+
+app.post("/api/users", (req, res) => {
+  const body = req.body;
+  // this body returns as undefined. So we need to use a middleware. After using middleware output will be as object.
+  users.push({ ...body, id: users.length + 1 });
+  fs.writeFile("./MOCK_DATA.json", JSON.stringify(users), (err, data) => {
+    return res.json({ status: "pending" });
+  });
+});
+
+app.listen(PORT, () => {
+  console.log("Server Started");
+});
+```
