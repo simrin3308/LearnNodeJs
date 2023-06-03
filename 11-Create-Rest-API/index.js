@@ -58,7 +58,7 @@ app.get('/users', (req, res) => {
 // we can see these 4,5,6 are same routes so me can merge them
 
 // middleware for body
-app.use(express.urlencoded({ extended: false}))
+app.use(express.urlencoded({ extended: false }))
 
 // grouping
 app.route("/api/users/:Id")
@@ -74,7 +74,7 @@ app.route("/api/users/:Id")
     })
 
 // app.post("/api/users", (req, res) => {
-    //     const body = req.body;
+//     const body = req.body;
 //     console.log('body', body);
 //     return res.json({ status: "pending" })
 // })
@@ -82,11 +82,11 @@ app.route("/api/users/:Id")
 // id do not comes from frontEnd
 app.post("/api/users", (req, res) => {
     const body = req.body;
-    users.push({...body, id:users.length + 1})
-    fs.writeFile("./MOCK_DATA.json", JSON.stringify(users),(err, data)=>{
-        return res.json({status:"pending"})
+    users.push({ ...body, id: users.length + 1 })
+    fs.writeFile("./MOCK_DATA.json", JSON.stringify(users), (err, data) => {
+        return res.json({ status: "pending" })
     })
-    
+
 })
 
 app.listen(PORT, () => {

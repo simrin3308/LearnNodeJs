@@ -778,6 +778,8 @@ app.post("/api/users", (req, res) => {
 });
 ```
 
+Use `POSTMAN` for sending post requests.
+
 ```js
 // middleware for body
 app.use(express.urlencoded({ extended: false }));
@@ -795,3 +797,27 @@ app.listen(PORT, () => {
   console.log("Server Started");
 });
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+# 12. MiddleWares
+
+Client > request(get on /users) > In server we have a route called '/user' > Express checks which block of code to run > then sends the result.
+
+But with middleWares=>
+* Client > request(get on /users) > Request goes to middleWare > middleWare checks everything > If everything is good > middleWare will send the request to the server. If not it sends req back to the client >  In server we have a route called '/user' > Express checks which block of code to run > then sends the result.
+
+* We can have different middleWares. Request can go through different middleWares. Every middleWare has different work.
+
+* Next middleWares is commonly denoted by `next`.
+
+*
