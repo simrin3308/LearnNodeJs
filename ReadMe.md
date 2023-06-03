@@ -750,7 +750,9 @@ app.listen(PORT, () => {
 app
   .route("/api/users/:Id")
   .get((req, res) => {
-    return res.json({ status: "pending" });
+    const ID = Number(req.params.Id);
+    const user = users.find((user) => user.id === ID);
+    return res.json(user);
   })
   .patch((req, res) => {
     const Id = Number(req.params.Id);
@@ -798,26 +800,84 @@ app.listen(PORT, () => {
 });
 ```
 
-
-
-
-
-
-
-
-
-
-
-
 # 12. MiddleWares
 
 Client > request(get on /users) > In server we have a route called '/user' > Express checks which block of code to run > then sends the result.
 
 But with middleWares=>
-* Client > request(get on /users) > Request goes to middleWare > middleWare checks everything > If everything is good > middleWare will send the request to the server. If not it sends req back to the client >  In server we have a route called '/user' > Express checks which block of code to run > then sends the result.
 
-* We can have different middleWares. Request can go through different middleWares. Every middleWare has different work.
+- Client > request(get on /users) > Request goes to middleWare > middleWare checks everything > If everything is good > middleWare will send the request to the server. If not it sends req back to the client > In server we have a route called '/user' > Express checks which block of code to run > then sends the result.
 
-* Next middleWares is commonly denoted by `next`.
+- We can have different middleWares. Request can go through different middleWares. Every middleWare has different work.
 
-*
+- Next middleWares is commonly denoted by `next`.
+
+- middleWares works line by line
+
+* MiddleWares has three parameters => `req, res, next`
+
+```js
+////// middleWares
+//This will run first
+app.use(express.urlencoded({ extended: false }));
+
+//This will run Second
+// Custom middleWares
+app.use((req, res, next) => {
+  console.log("Hello from middleWares 1");
+});
+```
+
+This will not end at last because we do not provide `res.end`
+
+- This will Return the message.
+
+```js
+// Custom middleWares
+app.use((req, res, next) => {
+  console.log("Hello from middleWares 1");
+  return res.json({ msg: "Hello from middleWares 1" });
+});
+```
+
+- With next
+
+```js
+app.use((req, res, next) => {
+  console.log("Hello from middleWares 1");
+  next();
+});
+```
+
+- Multiple middleWares
+
+```js
+app.use((req, res, next) => {
+  console.log("Hello from middleWares 1");
+  next();
+});
+app.use((req, res, next) => {
+  console.log("Hello from middleWares 2");
+  next();
+});
+```
+
+- Data sending in middleWares
+  myUserName initialized in middleWare 1 is available to 2
+
+```js
+app.use((req, res, next) => {
+  console.log("Hello from middleWares 1");
+  console.log(req);
+  req.myUserName = "sam";
+  next();
+});
+app.use((req, res, next) => {
+  console.log("Hello from middleWares 2", req.myUserName);
+  next();
+});
+// RESULT =>
+// Server Started
+// Hello from middleWares 1
+// Hello from middleWares 2 sam
+```

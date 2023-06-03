@@ -1,0 +1,25 @@
+Creation of rest api which supports JSON data
+
+
+
+
+TASK 1.1 GET /api/users => List all users(json)
+
+
+TASK 1.2 GET /users => List all users(HTML)
+
+
+TASK 2. Get /api/users/1 => List details of user with ID 1
+
+
+TASK 3. Get /api/users/2 => List details of user with ID 2
+
+
+TASK 4. POST /users => Create new user
+
+
+TASK 5. PATCH /user/1 => Edit the user at id 1
+
+
+TASK 6.> DELETE /user/1 => Delete the user at ID 1
+
