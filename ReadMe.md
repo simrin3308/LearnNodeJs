@@ -949,3 +949,66 @@ app.post("/api/users/", (req, res) => {
   });
 });
 ```
+
+
+# 16. MongoDB
+
+* Non sql{Structured query language} documented based database
+
+* Non sql works on document and sql works on tables.
+
+* Based on BSON format
+
+* Strong support for aggregation pipelines.
+
+* Best for node applications
+
+* Architecture of MONGODB
+we have collections and collections have documents. 
+
+
+
+* Useful Commands in MongoDB:
+1. MongoDB - Create Database
+use csCorner
+
+2. show dbs If you want to check your databases list, use the command 
+
+Your created database  is not present in list. To display database, you need to insert at least one document into it
+
+3. MongoDB - Drop Database
+db.dropDatabase()
+
+4. MongoDB - Create Collection
+db.createCollection(name)
+db.createCollection("students")
+
+5. MongoDB-Create Document.
+db.students.insert({"rollNo":1,"name":"sunita"})
+
+If the collection doesn't exist in the database, then MongoDB will create this collection and then insert a document into it.
+
+6. MongoDB -Show Collection
+show collections
+
+7. MongoDB - Drop Collection
+db.students.drop()
+
+8. MongoDB - Query Document
+db.students.find()
+
+9. To display the results in a formatted way, you can use pretty method.
+db.mycol.find().pretty()
+
+10. use <db_name>
+
+11. show collections
+
+12. db.col.find()
+
+* db.users.find() => This gives us the document which we have created.
+
+13. db.col.insert() => We can create the Entries.
+
+
+
