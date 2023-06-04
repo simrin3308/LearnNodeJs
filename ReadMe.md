@@ -881,3 +881,28 @@ app.use((req, res, next) => {
 // Hello from middleWares 1
 // Hello from middleWares 2 sam
 ```
+
+
+
+# 14. HTTP HEADERS
+
+* Additional information with response and request are called headers.
+
+* Headers carry the additional information.
+
+* req headers => Path, scheme, language, cookies, user agent etc
+
+* res headers => Date, Content type 
+
+* There are many build in headers.
+
+* We can create our own custom headers but name of custom headers start with `x`
+
+```js
+app.get("/api/users/", (req, res) => {
+    res.setHeader('myName', "sam")
+    return res.json(users)
+})
+```
+
+* 
