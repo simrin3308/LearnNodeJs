@@ -882,27 +882,70 @@ app.use((req, res, next) => {
 // Hello from middleWares 2 sam
 ```
 
-
-
 # 14. HTTP HEADERS
 
-* Additional information with response and request are called headers.
+- Additional information with response and request are called headers.
 
-* Headers carry the additional information.
+- Headers carry the additional information.
 
-* req headers => Path, scheme, language, cookies, user agent etc
+- req headers => Path, scheme, language, cookies, user agent etc
 
-* res headers => Date, Content type 
+- res headers => Date, Content type
 
-* There are many build in headers.
+- There are many build in headers.
 
-* We can create our own custom headers but name of custom headers start with `x`
+- We can create our own custom headers but name of custom headers start with `x`
 
 ```js
 app.get("/api/users/", (req, res) => {
-    res.setHeader('myName', "sam")
-    return res.json(users)
-})
+  res.setHeader("myName", "sam");
+  return res.json(users);
+});
 ```
 
-* 
+# 15. Status Code
+
+- Status Code means whether a http request is completed or not.
+
+- We can set the status codes.
+
+1. 100-199 => Information Res
+
+-
+
+2. 200-299 => Successful Res
+
+200=> ok
+201=> created
+202=> accepted
+203=> Non Authoritative information
+204=> No content
+205=> Reset content
+
+3. 300-399 => Redirection Res
+4. 400-499 => Client Error Res
+
+400=> Bad request or not given full information
+401=> Unauthorized {no Login}
+402=> Payment required
+403=> Forbidden {You are logIn But u are not authorized to perform certain function.}
+404=> Not Found
+
+5. 500-599 => Server Error Res
+
+500=> Internal server error
+501=> Not implemented
+502=> Service unavailable
+
+- We can set status code by this =>
+
+```js
+// Set Status Code
+app.post("/api/users/", (req, res) => {
+  const body = req.body;
+  users.push({ id: users.length + 1, ...body });
+  fs.writeFile("./MOCK_DATA.json", JSON.stringify(users), (err, data) => {
+    return res.status(201).json({ status: "added" });
+  });
+});
+```
