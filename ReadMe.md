@@ -1138,3 +1138,74 @@ app.delete("/api/users/:ID", async (req, res) => {
   return res.json(allDbUsers);
 });
 ```
+
+# 18. Modern View Controller {MVC}
+
+- MVC is make up of three components. Model, View, Controller
+
+- controller manipulate the model and model updates the view.
+  => CONTROLLER => MODELS => VIEWS
+
+1. We need 4 folders. => models, routers, views, controllers.
+
+- In MODELS => schema, models and export function. {step2, step3}
+
+- In routers => We will give all the routers. We need to use router at the place of app. At last we will export it.
+
+```js
+const router = express.Router();
+// Routes
+module.exports = router;
+```
+
+- We can remove the path from the router file. In the index file, we need to import this router and use it with the path and the router name
+
+```js
+// IMPORT
+const userRouter = require("./routes/user");
+// USE
+app.use("/api/user/", userRouter);
+```
+
+2. Create `config.js` file for the connection of monoDb.
+
+```js
+const { model } = require("mongoose");
+
+const router = express.Router();
+
+const connectMongoDb = async (url) => {
+  return mongoose.connect(url);
+};
+
+module.exports = {
+  connectMongoDb,
+};
+```
+
+```js in index.js main file
+// Step 1 => Connection
+connectMongoDb("mongodb://127.0.0.1:27017/dummyUsers");
+```
+
+3. All the routers have the handler functions which are called controllers. These controllers needs to be in other file called controllers.
+
+```js in router/user.js
+const router = express.Router();
+
+router.get("/", handleGetAllUsers);
+```
+
+we create this handle function in `controller/index.js
+
+```js
+const User = require("../models/user");
+
+const handleGetAllUsers = async (req, res) => {
+  const allDbUsers = await User.find({});
+  return res.json(allDbUsers);
+};
+module.exports = { handleGetAllUsers };
+```
+
+Note=> It is `module.exports`, not `module.export`.
