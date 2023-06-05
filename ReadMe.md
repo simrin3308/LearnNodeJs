@@ -1209,3 +1209,108 @@ module.exports = { handleGetAllUsers };
 ```
 
 Note=> It is `module.exports`, not `module.export`.
+
+# 19. Create MVC from scratch with steps.
+
+1. const express, PORT, app.  
+   `index.js`
+
+2. Listen to the app
+
+```js
+app.listen(PORT, () => {
+  console.log(`Server started at ${PORT}`);
+});
+```
+
+3. Start the server and check if it console log's ``Server started at 8000`
+
+4. Import middleware
+
+```js
+// MiddleWares
+app.use(express.urlencoded({ extended: false }));
+```
+
+5. mongoose => models, routers, views, controllers.
+
+* 5.1> Models requires schema
+
+```js models/userModels.js
+const mongoose = require("mongoose");
+
+const userSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  gender: {
+    type: String,
+  },
+});
+
+module.exports = Users = mongoose.model("Users", userSchema);
+```
+
+* 5.2>
+
+```js connections/connection
+const mongoose = require("mongoose");
+
+const connectWithMongoDb = async (url) => {
+  return mongoose.connect(url);
+};
+
+module.exports = { connectWithMongoDb };
+```
+
+* 5.3> Routes
+we can create different routes.
+
+```js router/userRoutes.js
+const express = require("express");
+const User = require("../models/userModels");
+const { handleGetAllUsers } = require("../controller/controller");
+const router = express.Router();
+
+// showAllUsers
+router.get("/", handleGetAllUsers);
+
+module.exports = router;
+```
+* 5.4> Routes
+```js controllers/controller.js
+const Users = require("../models/userModels");
+
+const handleGetAllUsers = async (req, res) => {
+  const allDbUsers = await Users.find({});
+  return res.json(allDbUsers);
+};
+
+module.exports = { handleGetAllUsers };
+```
+
+6. connections
+
+```js index.js
+const { connectWithMongoDb } = require("./connections/connection");
+
+connectWithMongoDb("mongodb://127.0.0.1:27017/dummyUsers").then(() =>
+  console.log("Mongoose Connected")
+);
+```
+7. connections
+Import middleware
+
+```js
+// MiddleWares
+app.use(express.urlencoded({ extended: false }));
+```
