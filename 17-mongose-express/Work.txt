@@ -1,0 +1,17 @@
+1> In mongoose we create a schema.
+
+
+2> In schema we define the structure.
+
+structure is =>
+
+{
+    id: 1,
+    fName:sam,
+    lName:singh
+}
+
+3> Then we create a Models using schema.
+
+
+4> Using models we do CRUD operations

@@ -950,55 +950,53 @@ app.post("/api/users/", (req, res) => {
 });
 ```
 
-
 # 16. MongoDB
 
-* Non sql{Structured query language} documented based database
+- Non sql{Structured query language} documented based database
 
-* Non sql works on document and sql works on tables.
+- Non sql works on document and sql works on tables.
 
-* Based on BSON format
+- Based on BSON format
 
-* Strong support for aggregation pipelines.
+- Strong support for aggregation pipelines.
 
-* Best for node applications
+- Best for node applications
 
-* Architecture of MONGODB
-we have collections and collections have documents. 
+- Architecture of MONGODB
+  we have collections and collections have documents.
 
+- Useful Commands in MongoDB:
 
-
-* Useful Commands in MongoDB:
 1. MongoDB - Create Database
-use csCorner
+   use csCorner
 
-2. show dbs If you want to check your databases list, use the command 
+2. show dbs If you want to check your databases list, use the command
 
-Your created database  is not present in list. To display database, you need to insert at least one document into it
+Your created database is not present in list. To display database, you need to insert at least one document into it
 
 3. MongoDB - Drop Database
-db.dropDatabase()
+   db.dropDatabase()
 
 4. MongoDB - Create Collection
-db.createCollection(name)
-db.createCollection("students")
+   db.createCollection(name)
+   db.createCollection("students")
 
 5. MongoDB-Create Document.
-db.students.insert({"rollNo":1,"name":"sunita"})
+   db.students.insert({"rollNo":1,"name":"sunita"})
 
 If the collection doesn't exist in the database, then MongoDB will create this collection and then insert a document into it.
 
 6. MongoDB -Show Collection
-show collections
+   show collections
 
 7. MongoDB - Drop Collection
-db.students.drop()
+   db.students.drop()
 
 8. MongoDB - Query Document
-db.students.find()
+   db.students.find()
 
 9. To display the results in a formatted way, you can use pretty method.
-db.mycol.find().pretty()
+   db.mycol.find().pretty()
 
 10. use <db_name>
 
@@ -1006,9 +1004,137 @@ db.mycol.find().pretty()
 
 12. db.col.find()
 
-* db.users.find() => This gives us the document which we have created.
+- db.users.find() => This gives us the document which we have created.
 
 13. db.col.insert() => We can create the Entries.
 
+# 17. Connect MongoDB with Express and do CRUD
 
+1. Connect Mongoose
 
+```js
+// Step 1 => Connection
+
+mongoose
+  .connect("mongodb://127.0.0.1:27017/dummyUsers")
+  .then(() => console.log("Mongoose connected"))
+  .catch((err) => console.log("error", err));
+```
+
+2. In mongoose we create a schema.
+
+```js
+// Step 2 => Create schema
+
+const userSchema = new mongoose.Schema({
+  firstName: {
+    type: string,
+    required: true,
+  },
+  lastName: {
+    type: string,
+  },
+  email: {
+    type: string,
+    required: true,
+    unique: true,
+  },
+  gender: {
+    type: string,
+  },
+});
+```
+
+In schema we define the structure.
+
+structure is =>
+
+{
+id: 1,
+fName:sam,
+lName:singh
+}
+
+3. Then we create a Models using schema.
+
+```js
+// step 3 => Create Modal
+
+const User = mongoose.model("user", userSchema);
+```
+
+4. Using models we do CRUD operations
+
+<!-- Get All Users -->
+
+```js
+app.get("/api/users/", async (req, res) => {
+  const allDbUsers = await User.find({});
+  return res.json(allDbUsers);
+});
+```
+
+<!-- users with id IN mongoose -->
+
+```js
+app.get("/api/users/:ID", async (req, res) => {
+  const user = await User.findById(req.params.ID);
+  if (!user) return res.status(404).json({ msg: "No User Found" });
+  return res.json(user);
+});
+```
+
+<!-- POST -->
+
+```js
+app.post("/api/users/", async (req, res) => {
+  const body = req.body;
+
+  if (
+    !body ||
+    !body.firstName ||
+    !body.lastName ||
+    !body.email ||
+    !body.gender
+  ) {
+    return res.status(400).json({ msg: "All field are required" });
+  }
+
+  const result = await User.create({
+    firstName: body.firstName,
+    lastName: body.lastName,
+    email: body.email,
+    gender: body.gender,
+  });
+  console.log(result);
+
+  return res.status(201).json({ msg: "Sucess" });
+});
+```
+
+<!-- Patch -->
+
+```js
+app.patch("/api/users/:ID", async (req, res) => {
+  const body = req.body;
+  const user = await User.findByIdAndUpdate(req.params.ID, {
+    firstName: body.firstName,
+    lastName: body.lastName,
+    email: body.email,
+    gender: body.gender,
+  });
+  const allDbUsers = await User.find({});
+
+  return res.json(allDbUsers);
+});
+```
+
+<!-- Delete -->
+
+```js
+app.delete("/api/users/:ID", async (req, res) => {
+  const user = await User.findByIdAndDelete(req.params.ID);
+  const allDbUsers = await User.find({});
+  return res.json(allDbUsers);
+});
+```
