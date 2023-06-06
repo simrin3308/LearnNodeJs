@@ -1307,8 +1307,7 @@ connectWithMongoDb("mongodb://127.0.0.1:27017/dummyUsers").then(() =>
   console.log("Mongoose Connected")
 );
 ```
-7. connections
-Import middleware
+7. Import middleware
 
 ```js
 // MiddleWares
