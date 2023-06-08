@@ -1319,35 +1319,321 @@ app.use(express.urlencoded({ extended: false }));
 
 # 20. Url Shortener
 
+POST/URL
+GET/URL/:ID
+Get/URL/analytics/:ID
+
+1. npm init => package.json will be created and npm i express mongoose nodemorn shortid
+2. const Port and Listen to the app
+
+```js
+app.listen(PORT, () => {
+  console.log(`Server started at ${PORT}`);
+});
+```
+
+3. Start the server and check if it console log's `Server started at 8000`
+
+4. Import middleware
+
+```js
+// MiddleWares
+app.use(express.json()); //to support json data or to parse the incoming data from body
+app.use(express.urlencoded({ extended: false }));
+```
+
+5. mongoose => models, routers, views, controllers.
+
+- 5.1> Models requires schema
+
+```js models/urlModel.js
+const mongoose = require("mongoose");
+const urlSchema = new mongoose.Schema(
+  {
+    shortId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    redirectUrl: {
+      type: String,
+      required: true,
+    },
+    visitHistory: [
+      {
+        timestamps: {
+          value: 1,
+          type: Number,
+        },
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
+const URL = mongoose.model("url", urlSchema);
+module.exports = URL;
+```
+
+- 5.2>
+
+```js connections/connection
+const mongoose = require("mongoose");
+
+const connectWithMongoDb = async (url) => {
+  return mongoose.connect(url);
+};
+
+module.exports = { connectWithMongoDb };
+```
+
+- 5.3> Routes
+
+- 5.3.1> Provide urlRouter . index file.
+
+```js index.js
+app.use("/url", urlRouter);
+```
+
+- 5.3.2> in urlRouter file, create the route.
+
+```js urlRouter.js
+const express = require("express");
+const { handleGenerateShortUrl } = require("../controllers/urlController");
+const router = express.Router();
+
+router.post("/", handleGenerateShortUrl);
+```
+
+- 5.3.3> In urlController.js, give the functions of the routers. We can also import the data from DB as we import the `URL` below.
+
+```js urlRouter.js
+const express = require("express");
+const { handleGenerateShortUrl } = require("../controllers/urlController");
+const router = express.Router();
+
+router.post("/", handleGenerateShortUrl);
+```
+
+```js urlController.js
+const shortid = require("shortid");
+const URL = require("../models/urlModel");
+
+const handleGenerateShortUrl = async (req, res) => {
+  const body = req.body;
+  if (!body.url) return res.status(400).json({ error: "Url is required" });
+  const shortID = shortid();
+  await URL.create({
+    shortId: shortID,
+    redirectUrl: body.url,
+    visitHistory: [],
+  });
+  return res.json({ id: shortID });
+};
+```
+
+- 5.3.4> Similarly we will create the routes and handlers of other route also.
+
+```js urlRouter.js
+const express = require("express");
+const {
+  handleGenerateShortUrl,
+  handleGetAnalytics,
+} = require("../controllers/urlController");
+const router = express.Router();
+
+router.post("/", handleGenerateShortUrl);
+router.get("/analytics/:shortID", handleGetAnalytics);
+
+module.exports = router;
+```
+
+```js urlController.js
+// fetch data from database > return the clicks and analytics
+const handleGetAnalytics = async (req, res) => {
+  const shortId = req.params.shortID;
+  const result = await URL.findOne({ shortId });
+  console.log(result);
+  return res.json({
+    TotalClicks: result.visitHistory.length,
+    analytics: result.visitHistory,
+  });
+};
+module.exports = { handleGenerateShortUrl, handleGetAnalytics };
+```
+
+- 5.3.5> Route=> `/url/:id` => This is redirect url
+
+fetch data from database > update or increment > redirect the user
+
+```js index.js
+app.get("/url/:shortID", async (req, res) => {
+  // get this id
+  const shortId = req.params.shortID;
+
+  // fetch data from database
+  const entry = await URL.findOneAndUpdate(
+    {
+      shortId,
+    },
+    {
+      // update or increment
+      $push: {
+        visitHistory: {
+          timestamps: Date.now(), // we have given this as we wrote in urlModels schema
+        },
+      },
+    }
+  );
+  // redirect the user
+  res.redirect(entry.redirectUrl);
+});
+```
+
+<!-- Also follow the ejs steps -->
+
 # 21. EJS => Template engine
 
-https://www.digitalocean.com/community/tutorials/how-to-use-ejs-to-template-your-node-application
+`https://www.digitalocean.com/community/tutorials/how-to-use-ejs-to-template-your-node-application`
 
-1. Set view engine to ejs
+<!-- VIEWS folder work will start from here -->
+
+6. Set view engine to ejs
+   npm i ejs
 
 ```js
 app.set("view engine", "ejs");
 ```
 
-2. import path and set the views path
+7. import path and set the views path
 
 ```js
 const path = require("path");
 app.set("views", path.resolve("./views"));
 ```
 
-3. Use app.render
+8. Create a static router. All the front end pages come in static router.
 
-```js
+```js router/staticRouter.js
+const express = require("express");
+const URL = require("../models/urlModel");
+const router = express.Router();
+
+router.get("/", async (req, res) => {
+  //homepage
+  // we need to display users on homepage.
+  const allUrls = await URL.find({});
+  return res.render("home", { urls: allUrls });
+});
+
+module.exports = router;
+```
+
+9. Use static router in index
+
+```js index.js
+app.use("/", staticRoute);
+```
+
+8. Use app.render
+   In views we need to create a file named `home.ejs`
+   Ejs is a html file.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=
+    , initial-scale=1.0"
+    />
+    <title>Document</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Url Shortener</h1>
+    <% if (locals.id) { %>
+    <!-- Locals is actually data coming from backend-->
+    <p>URL Generated: http://localhost:4999/url/<%= id %></p>
+    <% } %>
+    <div>
+      <!-- We need to give method that is POST and action is the path where we need to post it. Here we have POST on `/url`. 
+      
+      Check urlRouter.js. Name we need to set which we have used earlier. eg body.url 
+      
+      This is a FORM data which we cant use directly. We need a middleware express.urlencoded which is used above
+      -->
+      <form method="POST" action="/url">
+        <label>Enter your original url</label>
+        <!-- name property is very important because this name is going to be passed in backend -->
+        <input type="text" name="url" placeholder="https://example.com" />
+        <button type="submit">Generate</button>
+        <!-- 
+          When we click on the submit button, /POST will run or handleGenerateShortUrl will run
+          const handleGenerateShortUrl = async  (req, res) => {
+          const body = req.body;
+          if (!body.url) return res.status(400).json({ error: "Url is required" })
+          const shortID = shortid()
+          await URL.create({
+        shortId: shortID,
+        redirectUrl: body.url,
+        visitHistory: [],
+    });
+          return res.render("home", { id: shortID })
+    // return res.json({ id: shortID })
+}
+
+Here we need to do SSR. so we need to render the data. We also need to pass the id. This id will be used to render the id on the frontend. Check html body where we check if id is coming. We can use this id by locals.id
+         -->
+      </form>
+    </div>
+    <div>
+      <% if (locals.urls) { %>
+      <!-- This urls comes from the homepage of static router.  If we have urls in db, we need to display them in tables. -->
+      <table>
+        <thead>
+          <th>S. No</th>
+          <th>Short Id</th>
+          <th>Redirect</th>
+          <th>Clicks</th>
+        </thead>
+        <tbody>
+          <% urls.forEach((url, index)=> { %>
+          <!-- For each also returns index which we used to display the S NO. urls have all the data which we can use in the front end. Ths urls is actually all the data from the database -->
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= url.shortId %></td>
+            <td><%= url.redirectUrl %></td>
+            <td><%= url.visitHistory.length %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+  </body>
+</html>
+```
+
+```js index.js
 app.get("/url/test", async (req, res) => {
   const allUrls = await URL.find({});
   return res.render("home");
 });
 ```
 
-4. Use app.render and sending data
+9. Use app.render and sending data
 
-```js
+```js index.js
 // passing variables
 app.get("/url/test", async (req, res) => {
   const allUrls = await URL.find({});
@@ -1357,7 +1643,7 @@ app.get("/url/test", async (req, res) => {
 });
 ```
 
-5. Using variables in ejs file.
+10. Using variables in ejs file.
 
 ```js
 <body>
