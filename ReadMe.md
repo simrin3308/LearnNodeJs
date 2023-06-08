@@ -1234,7 +1234,7 @@ app.use(express.urlencoded({ extended: false }));
 
 5. mongoose => models, routers, views, controllers.
 
-* 5.1> Models requires schema
+- 5.1> Models requires schema
 
 ```js models/userModels.js
 const mongoose = require("mongoose");
@@ -1260,7 +1260,7 @@ const userSchema = new mongoose.Schema({
 module.exports = Users = mongoose.model("Users", userSchema);
 ```
 
-* 5.2>
+- 5.2>
 
 ```js connections/connection
 const mongoose = require("mongoose");
@@ -1272,8 +1272,8 @@ const connectWithMongoDb = async (url) => {
 module.exports = { connectWithMongoDb };
 ```
 
-* 5.3> Routes
-we can create different routes.
+- 5.3> Routes
+  we can create different routes.
 
 ```js router/userRoutes.js
 const express = require("express");
@@ -1286,7 +1286,9 @@ router.get("/", handleGetAllUsers);
 
 module.exports = router;
 ```
-* 5.4> Routes
+
+- 5.4> Routes
+
 ```js controllers/controller.js
 const Users = require("../models/userModels");
 
@@ -1307,6 +1309,7 @@ connectWithMongoDb("mongodb://127.0.0.1:27017/dummyUsers").then(() =>
   console.log("Mongoose Connected")
 );
 ```
+
 7. Import middleware
 
 ```js
@@ -1314,7 +1317,55 @@ connectWithMongoDb("mongodb://127.0.0.1:27017/dummyUsers").then(() =>
 app.use(express.urlencoded({ extended: false }));
 ```
 
-
-
 # 20. Url Shortener
 
+# 21. EJS => Template engine
+
+https://www.digitalocean.com/community/tutorials/how-to-use-ejs-to-template-your-node-application
+
+1. Set view engine to ejs
+
+```js
+app.set("view engine", "ejs");
+```
+
+2. import path and set the views path
+
+```js
+const path = require("path");
+app.set("views", path.resolve("./views"));
+```
+
+3. Use app.render
+
+```js
+app.get("/url/test", async (req, res) => {
+  const allUrls = await URL.find({});
+  return res.render("home");
+});
+```
+
+4. Use app.render and sending data
+
+```js
+// passing variables
+app.get("/url/test", async (req, res) => {
+  const allUrls = await URL.find({});
+  return res.render("home", {
+    urls: allUrls,
+  });
+});
+```
+
+5. Using variables in ejs file.
+
+```js
+<body>
+    Hello from servers
+    <ul>
+    <% urls.forEach(url => { %>
+        <l1><%= url.shortId %></l1>
+    <% }) %>
+    </ul>
+</body>
+```
