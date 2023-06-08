@@ -1318,6 +1318,9 @@ app.use(express.urlencoded({ extended: false }));
 ```
 
 # 20. Url Shortener
+![image](https://github.com/simrin3308/LearnNodeJs/assets/110960043/9654f17a-5e43-4df1-9a5b-174023d14e4c)
+
+
 
 POST/URL
 GET/URL/:ID
