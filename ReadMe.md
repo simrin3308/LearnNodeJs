@@ -1,6 +1,6 @@
 # 1.
 
-- To run a file => {Node index} in terminal
+- To run a file => {Node index} in terminal. 
 
 - npm init for initializing. It will create the new file package.Json. This file will have all the dependencies. We can create our own scripts.
   eg
