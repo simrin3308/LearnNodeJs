@@ -1318,9 +1318,8 @@ app.use(express.urlencoded({ extended: false }));
 ```
 
 # 20. Url Shortener
+
 ![image](https://github.com/simrin3308/LearnNodeJs/assets/110960043/9654f17a-5e43-4df1-9a5b-174023d14e4c)
-
-
 
 POST/URL
 GET/URL/:ID
@@ -1658,3 +1657,423 @@ app.get("/url/test", async (req, res) => {
     </ul>
 </body>
 ```
+
+# 22. authentication
+
+It has two patterns.
+
+- 22.1> state full
+  State is a data which is used to map to store something.
+  client > auth middleware > endpoint route
+
+1. create user.js in models
+
+```js filename: models/userModels.js
+const mongoose = require("mongoose");
+
+const userSchema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const User = mongoose.model("user", userSchema);
+
+module.exports = User;
+```
+
+2. For authentication we need different set of routes.
+
+In routes create userRoute.js
+
+```js
+const express = require("express");
+const { handleUserSignUp } = require("../controllers/userController");
+
+const router = express.Router();
+
+// signUp
+router.post("/", handleUserSignUp);
+module.exports = router;
+```
+
+3. Create a controller function in userController.js=>
+
+```js
+const User = require("../models/userModels");
+
+async function handleUserSignUp(req, res) {
+  const { name, password, email } = req.body;
+  await User.create({
+    name,
+    email,
+    password,
+  });
+  return res.render("home");
+}
+
+module.exports = {
+  handleUserSignUp,
+};
+```
+
+4. Import userRouter.js in index file.
+   Register the particular router.
+
+```js
+app.use("/user", userRouter);
+```
+
+5. Create a page in views which is used for signup.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>signup</h1>
+    <form action="/user" method="POST">
+      <label>Full Name</label>
+      <input type="text" name="name" />
+      <label>Email</label>
+      <input type="text" name="email" />
+      <label>Password</label>
+      <input type="text" name="password" />
+      <button type="submit">Sign Up</button>
+    </form>
+  </body>
+</html>
+```
+
+- In action we need the give the name of the route.
+
+- Name is very important because in userController we get the properties by name only. Check user controller =>
+
+```js
+--------
+async function handleUserSignUp(req, res)
+  const { name, password, email } = req.body;
+
+  --------
+```
+
+6. SignUp is a static page. So it needs to come in the static router.
+
+```js
+router.get("/signup", async (req, res) => {
+  return res.render("signup");
+});
+```
+
+7. At this point when we create a new user, it should be added to the /user route. We can check this in ths terminal.
+
+[
+{
+_id: ObjectId("6487f9bb4ba1a0db41f501ad"),
+name: 'sam',
+email: 'sam@gmail.com',
+password: '12345678',
+createdAt: ISODate("2023-06-13T05:08:12.000Z"),
+updatedAt: ISODate("2023-06-13T05:08:12.000Z"),
+__v: 0
+}
+]
+
+8. Now we need to do something like only login user should have the access of the url shortener service.
+
+We need to create the login route also as we create the signup route.
+
+```js //userRouter.js
+router.post("/login", handleUserLogin);
+```
+
+```js
+async function handleUserLogin(req, res) {
+  const { password, email } = req.body;
+  const user = await User.findOne({ email, password });
+  if (!user)
+    return res.render("login", { error: "Invalid username or password." });
+  return res.redirect("/");
+}
+module.exports = {
+  handleUserSignUp,
+  handleUserLogin,
+};
+```
+
+Create a page for login in views and also in include in static.js
+
+```html //login.ejs
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <h1>Log in</h1>
+    <form action="/user/login" method="POST">
+      <label>Email</label>
+      <input type="text" name="email" />
+      <label>Password</label>
+      <input type="text" name="password" />
+      <button type="submit">Log in</button>
+    </form>
+  </body>
+</html>
+```
+
+```js //In static router
+router.get("/user/login", async (req, res) => {
+  return res.render("login");
+});
+```
+
+9. Technically in login we need to generate a cookie or uuid. We need to do something like if password and email is right, we need to add a unique id in the user.
+
+first we create a unique id with uuid.
+
+```js controller.js
+async function handleUserLogin(req, res) {
+  const { password, email } = req.body;
+  const user = await User.findOne({ email, password });
+  if (!user)
+    return res.render("login", { error: "Invalid username or password." });
+  // create a session id
+  const sessionId = uuidv4();
+  return res.redirect("/");
+}
+module.exports = {
+  handleUserSignUp,
+  handleUserLogin,
+};
+```
+
+Now we have to store this session id with user object.
+For that we need to create a file auth.js
+
+In this we will create a function for setUser and getUser.
+
+```js auth.js
+const sessionIdToUserMap = new Map();
+
+function setUser(id, user) {
+  sessionIdToUserMap.set(id, user);
+}
+
+function getUser(id) {
+  return sessionIdToUserMap.get(id);
+}
+
+module.exports = {
+  setUser,
+  getUser,
+};
+```
+
+10. We need to import userId in controller function so that we can set it.
+
+```js
+const User = require("../models/userModels");
+const { v4: uuidv4 } = require("uuid");
+const { setUser } = require("../service/auth");
+
+async function handleUserSignUp(req, res) {
+  const { name, password, email } = req.body;
+  await User.create({
+    name,
+    email,
+    password,
+  });
+  return res.redirect("/");
+}
+async function handleUserLogin(req, res) {
+  const { password, email } = req.body;
+  const user = await User.findOne({ email, password });
+  if (!user)
+    return res.render("login", { error: "Invalid username or password." });
+  // create a session id and store it with the user
+  const sessionId = uuidv4();
+  // set the user with the id
+  setUser(sessionId, user);
+  // set the cookie
+  res.cookie("uid", sessionId);
+  return res.redirect("/");
+}
+
+module.exports = {
+  handleUserSignUp,
+  handleUserLogin,
+};
+```
+
+Now if we will login to our page, we will see that cookie will be generated.
+Cookie will have a value which was earlier generated by uuid called session id.
+Now we need to store this cookie in our server so that we can check the user. This can be done by middleware.
+
+11. Create a authMiddleware.js
+
+Earlier we have created the setUser and getUser
+
+```js
+const { getUser } = require("../service/auth");
+
+async function restrictToLoginUserOnly(req, res, next) {
+  const userUid = req.cookies.uid;
+  // we will get the id from cookie.
+  if (!userUid) return res.redirect("/login");
+
+  // this cookie will be then send to get user so that we can get the user with same id.
+  const user = getUser(userUid);
+  if (!user) return res.redirect("/login");
+  // If we get the user, we will send it to user and call the next function.
+  req.user = user;
+  next();
+}
+
+module.exports = {
+  restrictToLoginUserOnly,
+};
+```
+
+- We need to install cookie parser because this will parse the cookies.
+
+```
+npm i cookie-parser
+```
+
+we need to import it and use it in index.js
+
+```js
+app.use(cookieParser());
+```
+
+12. Now if we have to work with `/url', we need to stay login.
+
+```js
+app.use("/url", restrictToLoginUserOnly, urlRouter);
+```
+
+restrictToLoginUserOnly => Inline middleware
+/url will work only if user in logIn.
+
+13. If our server restarts, the uuid gets changed.
+    This gets empty.
+
+```js
+const sessionIdToUserMap = new Map();
+```
+
+14. If u are in home page, you should get to see only ur urls not urls of other user.
+
+we need to create createdBy in models
+In url models we will add created by or generated by=>
+```js
+const mongoose = require("mongoose");
+
+const urlSchema = new mongoose.Schema(
+  {
+    shortId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    redirectUrl: {
+      type: String,
+      required: true,
+    },
+    visitHistory: [
+      {
+        timestamps: {
+          value: 1,
+          type: Number,
+        },
+      },
+    ],
+    createdBy: {
+      // mongoose has special type for the ids
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+const URL = mongoose.model("url", urlSchema);
+module.exports = URL;
+```
+* 
+
+In urlControllers =>
+```js
+const handleGenerateShortUrl = async (req, res) => {
+    const body = req.body;
+    if (!body.url) return res.status(400).json({ error: "Url is required" })
+    const shortID = shortid()
+    await URL.create({
+        shortId: shortID,
+        redirectUrl: body.url,
+        visitHistory: [],
+        createdBy:req.user._id,
+        //req.user_id comes from the middleware which we created in userMiddleware.js
+    });
+    return res.render("home", { id: shortID })
+    // return res.json({ id: shortID })
+```
+we will get this in urls
+
+[
+  {
+    _id: ObjectId("648814d7b03de1f036698315"),
+    shortId: 'z5ALRsvCv',
+    redirectUrl: 'https://www.youtube.com/',
+    visitHistory: [
+      {
+        timestamps: 1686639835370,
+        _id: ObjectId("648814dbb03de1f036698317")
+      },
+      {
+        timestamps: 1686639900022,
+        _id: ObjectId("6488151cb03de1f036698319")
+      }
+    ],
+    createdBy: ObjectId("6487f9bb4ba1a0db41f501ad"),
+    createdAt: ISODate("2023-06-13T07:03:51.365Z"),
+    updatedAt: ISODate("2023-06-13T07:05:00.023Z"),
+    __v: 0
+  }
+]
+
+* We need to only show that urls which are created by that users.
+
+In static router, we actually send all the urls but we need to send only that url which are registered by the user. For that we need current user
+```js
+router.get('/', async (req, res) => {
+    const allUrls = await URL.find({})
+    return res.render("home", { urls: allUrls })
+})
+```
+
+
