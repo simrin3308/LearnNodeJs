@@ -2093,3 +2093,97 @@ router.get("/", async (req, res) => {
   return res.render("home", { urls: allUrls });
 });
 ```
+
+# 23. JWT
+jwt is json web tokens.
+In tokens we can store the actual data.
+
+* Drawbacks of state full =>
+1. If our state is lost, all the users gets log out.
+2. It uses our server memory and we have limited memory.
+3. Session id always changes when server restarts, or loads. but jwt remains there.
+
+* banking websites are secure and uses session storage
+* Tokens have a expiry also.
+* In serverless architecture only jet tokens are used.
+
+* Get started with jwt
+1. We will remove the sessions.
+2. In service/auth.js we need to create the tokens by taking the data from frontend.
+
+```js
+const jwt = require('jsonwebtoken');
+const secret = "qwerty"
+// this function will create the tokens. This function will return us token which we can store in  the form of cookies.
+function setUser(user) {
+  // now we will create tokens for user
+  // first we will create payload 
+
+  const payload = {
+    _id: user._id,
+    email: user.email
+  }
+  return jwt.sign(payload, secret)
+}
+
+function getUser(token) {
+  if (!token) return null;
+  return jwt.verify(token, secret)
+}
+
+module.exports = {
+  setUser,
+  getUser,
+}
+```
+3. In userController.js
+
+```js
+async function handleUserLogin(req, res) {
+    const { password, email } = req.body;
+    const user = await User.findOne({ email, password })
+    if (!user) return res.render('login',
+        { error: 'Invalid username or password.' })
+
+    // since our email and password matched, we need to create tokens. That can be created by setUser which we create in auth.js.
+
+    const token = setUser(user);
+    res.cookie('uid', token)
+    return res.redirect("/")
+}
+```
+
+4. We need to get the user now.
+
+
+
+```js
+function getUser(token) {
+  if (!token) return null;
+
+  return jwt.verify(token, secret)
+}
+```
+
+* In authMiddleware we need to get the user. 
+```js
+async function restrictToLoginUserOnly(req, res, next) {
+  // we first store the token in cookie. 
+    const userUid = req.cookies?.uid;
+// here we get the cookie.
+    if (!userUid) return res.redirect("/user/login")
+// if no cookie, redirect to login.
+    const user = getUser(userUid)
+    // This userUid is actually token which we stored, when we login the page.
+    if (!user) return res.redirect("/user/login")
+
+    req.user = user;
+    next()
+}
+```
+
+* Whenever we try to replace the tokens in application/cookies, the page will not load or our app will crash. We will get the error=> 'invalid signature'
+
+* Secret key is very important because only that person can change the token which has the secret key.
+
+* Token cant be duplicate.
