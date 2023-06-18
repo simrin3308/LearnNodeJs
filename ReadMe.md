@@ -2186,4 +2186,4 @@ async function restrictToLoginUserOnly(req, res, next) {
 
 * Secret key is very important because only that person can change the token which has the secret key.
 
-* Token cant be duplicate.
+* Token can't be duplicate.
